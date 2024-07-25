@@ -139,11 +139,23 @@ pub trait Visitor<'ast>: Sized {
     fn visit_ident(&mut self, _ident: Ident) -> Self::Result {
         Self::Result::output()
     }
+    fn visit_id(&mut self, _id: &mut NodeId) {
+        // Do nothing.
+    }
+    fn visit_span(&mut self, _sp: &mut Span) {
+        // Do nothing.
+    }
     fn visit_foreign_item(&mut self, i: &'ast ForeignItem) -> Self::Result {
         walk_item(self, i)
     }
+    fn visit_foreign_mod(&mut self, nm: &mut ForeignMod) -> Self::Result {
+        walk_foreign_mod(self, nm);
+    }
     fn visit_item(&mut self, i: &'ast Item) -> Self::Result {
         walk_item(self, i)
+    }
+    fn visit_parenthesized_parameter_data(&mut self, p: &mut ParenthesizedArgs) -> Self::Result {
+        walk_parenthesized_parameter_data(self, p);
     }
     fn visit_local(&mut self, l: &'ast Local) -> Self::Result {
         walk_local(self, l)
@@ -162,6 +174,9 @@ pub trait Visitor<'ast>: Sized {
     }
     fn visit_pat(&mut self, p: &'ast Pat) -> Self::Result {
         walk_pat(self, p)
+    }
+    fn visit_angle_bracketed_parameter_data(&mut self, p: &mut AngleBracketedArgs) -> Self::Result {
+        walk_angle_bracketed_parameter_data(self, p);
     }
     fn visit_anon_const(&mut self, c: &'ast AnonConst) -> Self::Result {
         walk_anon_const(self, c)
@@ -189,11 +204,17 @@ pub trait Visitor<'ast>: Sized {
     fn visit_closure_binder(&mut self, b: &'ast ClosureBinder) -> Self::Result {
         walk_closure_binder(self, b)
     }
+    fn visit_where_clause(&mut self, where_clause: &mut WhereClause) -> Self::Result {
+        walk_where_clause(self, where_clause);
+    }
     fn visit_where_predicate(&mut self, p: &'ast WherePredicate) -> Self::Result {
         walk_where_predicate(self, p)
     }
     fn visit_fn(&mut self, fk: FnKind<'ast>, _: Span, _: NodeId) -> Self::Result {
         walk_fn(self, fk)
+    }
+    fn visit_coroutine_kind(&mut self, a: &mut CoroutineKind) -> Self::Result {
+        walk_coroutine_kind(self, a);
     }
     fn visit_assoc_item(&mut self, i: &'ast AssocItem, ctxt: AssocCtxt) -> Self::Result {
         walk_assoc_item(self, i, ctxt)
@@ -206,6 +227,9 @@ pub trait Visitor<'ast>: Sized {
     }
     fn visit_precise_capturing_arg(&mut self, arg: &'ast PreciseCapturingArg) {
         walk_precise_capturing_arg(self, arg);
+    }
+    fn visit_mt(&mut self, mt: &mut MutTy) -> Self::Result {
+        walk_mt(self, mt);
     }
     fn visit_poly_trait_ref(&mut self, t: &'ast PolyTraitRef) -> Self::Result {
         walk_poly_trait_ref(self, t)
@@ -231,6 +255,9 @@ pub trait Visitor<'ast>: Sized {
     fn visit_lifetime(&mut self, lifetime: &'ast Lifetime, _: LifetimeCtxt) -> Self::Result {
         walk_lifetime(self, lifetime)
     }
+    fn visit_macro_def(&mut self, def: &mut MacroDef) -> Self::Result {
+        walk_macro_def(self, def);
+    }
     fn visit_mac_call(&mut self, mac: &'ast MacCall) -> Self::Result {
         walk_mac(self, mac)
     }
@@ -250,6 +277,9 @@ pub trait Visitor<'ast>: Sized {
     }
     fn visit_path_segment(&mut self, path_segment: &'ast PathSegment) -> Self::Result {
         walk_path_segment(self, path_segment)
+    }
+    fn visit_qself(&mut self, qs: &mut Option<P<QSelf>>) -> Self::Result {
+        walk_qself(self, qs);
     }
     fn visit_generic_args(&mut self, generic_args: &'ast GenericArgs) -> Self::Result {
         walk_generic_args(self, generic_args)
@@ -272,6 +302,9 @@ pub trait Visitor<'ast>: Sized {
     fn visit_fn_ret_ty(&mut self, ret_ty: &'ast FnRetTy) -> Self::Result {
         walk_fn_ret_ty(self, ret_ty)
     }
+    fn visit_fn_decl(&mut self, d: &mut P<FnDecl>) -> Self::Result {
+        walk_fn_decl(self, d);
+    }
     fn visit_fn_header(&mut self, _header: &'ast FnHeader) -> Self::Result {
         Self::Result::output()
     }
@@ -283,6 +316,12 @@ pub trait Visitor<'ast>: Sized {
     }
     fn visit_crate(&mut self, krate: &'ast Crate) -> Self::Result {
         walk_crate(self, krate)
+    }
+    fn visit_meta_list_item(&mut self, list_item: &mut NestedMetaItem) -> Self::Result {
+        walk_meta_list_item(self, list_item);
+    }
+    fn visit_meta_item(&mut self, meta_item: &mut MetaItem) -> Self::Result {
+        walk_meta_item(self, meta_item);
     }
     fn visit_inline_asm(&mut self, asm: &'ast InlineAsm) -> Self::Result {
         walk_inline_asm(self, asm)
